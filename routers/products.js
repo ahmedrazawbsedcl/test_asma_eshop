@@ -94,13 +94,25 @@ router.put('/:id',async (req, res)=> {
     const category = await Category.findById(req.body.category);
     if(!category) return res.status(400).send('Invalid Category')
 
-    const product = await Product.findByIdAndUpdate(
+    const file= req.file;
+    let imagepath;
+  
+
+    if(file){
+        const fileName = filefilename
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        imagepath = `${basePath}${fileName}`
+    }else{
+        imagepath= product.image;
+    }
+
+    const updatedproduct = await Product.findByIdAndUpdate(
         req.params.id,
         {
             name: req.body.name,
             description: req.body.description,
             richDescription: req.body.richDescription,
-            image: req.body.image,
+            image: imagepath,
             brand: req.body.brand,
             price: req.body.price,
             category: req.body.category,
@@ -112,10 +124,10 @@ router.put('/:id',async (req, res)=> {
         { new: true}
     )
 
-    if(!product)
+    if(!updatedproduct)
     return res.status(500).send('the product cannot be updated!')
 
-    res.send(product);
+    res.send(updatedproduct);
 })
 
 router.delete('/:id', (req, res)=>{
